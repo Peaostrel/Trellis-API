@@ -153,10 +153,12 @@ function incompatibleReport(
   applied: AppliedMigration[],
   reason: string,
 ): StorageSchemaCompatibilityReport {
-  const currentTimestamp = applied.at(-1)?.timestamp;
+  const currentApplied = applied.length > 0 ? applied[applied.length - 1] : undefined;
   const currentVersion =
-    known.find((migration) => migration.timestamp === currentTimestamp)?.id ??
-    applied.at(-1)?.name ??
+    known.find(
+      (migration) => migration.timestamp === currentApplied?.timestamp,
+    )?.id ??
+    currentApplied?.name ??
     null;
 
   return {
