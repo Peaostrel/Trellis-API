@@ -9,6 +9,9 @@ import { AppService } from "./app.service";
 import { RateLimit } from "./common/decorators/rate-limit.decorator";
 import { JwtAuthGuard } from "./core/auth/jwt.guard";
 import { Public } from "./common/decorators/public.decorator";
+import { RequireRole } from "./common/guard/roles.decorator";
+import { Role } from "./common/guard/roles.enum";
+import type { StorageSchemaCompatibilityReport } from "./storage-compatibility/storage-schema-compatibility";
 
 @ApiTags("Info")
 @Controller()
@@ -77,6 +80,31 @@ export class AppController {
     modules: string[];
   } {
     return this.appService.getInfo();
+  }
+
+  @Get("ops/storage/migration-compatibility")
+  @RequireRole(Role.OPERATOR)
+  @RateLimit({ level: "standard" })
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Check storage migration compatibility",
+    description:
+      "Read-only operator check that verifies the applied TypeORM migration history is a valid prefix of the application migration chain. It never executes migrations.",
+    operationId: "getStorageMigrationCompatibility",
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      "Compatibility report with current, next and pending storage schema versions.",
+  })
+  @ApiResponse({ status: 401, description: "Authentication required" })
+  @ApiResponse({ status: 403, description: "Operator role or higher required" })
+  @ApiResponse({
+    status: 503,
+    description: "Migration history could not be read safely after retry handling",
+  })
+  getStorageMigrationCompatibility(): Promise<StorageSchemaCompatibilityReport> {
+    return this.appService.getStorageMigrationCompatibility();
   }
 
   @UseGuards(JwtAuthGuard)
