@@ -8,7 +8,7 @@ The API exposes a read-only operator endpoint for checking whether the database'
 
 Authentication is required. The minimum role is `OPERATOR`; the normal role hierarchy also permits `MAINTAINER` and `ADMIN`.
 
-The endpoint never runs, reverts, or edits a migration. It only reads TypeORM's migration history and compares it with timestamp-prefixed migration files discovered from the same locations used by `src/config/typeorm.config.ts` (`src/migrations/*` and nested `**/migration/*`).
+This is an internal operations endpoint and is intentionally excluded from the public Swagger/OpenAPI document and generated client SDKs. The endpoint never runs, reverts, or edits a migration. It only reads TypeORM's migration history and compares it with timestamp-prefixed migration files discovered from the same locations used by `src/config/typeorm.config.ts` (`src/migrations/*` and nested `**/migration/*`).
 
 ## Statuses
 
